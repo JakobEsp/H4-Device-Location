@@ -2,11 +2,15 @@
 
 void PSService::promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t type)
 {
-    Serial.println("Packet sniffed:");
     if (type == WIFI_PKT_MGMT)
-    { 
+    {
         wifi_promiscuous_pkt_t *pkt = (wifi_promiscuous_pkt_t *)buf;
-        Serial.printf("Management frame: %d bytes\n", pkt->rx_ctrl.sig_len);
+        if (pkt->rx_ctrl.rssi > -70)
+        {
+            Serial.println("Fine signal strength detected.");
+            Serial.printf("Management frame: %d bytes, RSSI: %d Payload: %u\n", pkt->rx_ctrl.sig_len, pkt->rx_ctrl.rssi, pkt->payload);
+            return;
+        }
     }
     else if (type == WIFI_PKT_CTRL)
     {
@@ -46,5 +50,8 @@ void PSService::setup()
     Serial.println("Registering promiscuous callback...");
     esp_wifi_set_promiscuous_rx_cb(promiscuousSniffCallback);
     Serial.println("Callback registered.");
-    esp_wifi_start();
+    wifi_scan_config_t config = {
+        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
+    };
+    esp_wifi_scan_start(&config, true);
 }

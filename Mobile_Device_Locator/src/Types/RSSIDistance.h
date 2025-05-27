@@ -1,4 +1,5 @@
 #pragma once
+
 enum RSSIDistance
 {
     VERY_CLOSE = -40,
@@ -7,7 +8,7 @@ enum RSSIDistance
     FAR = -80,
 };
 
-const char* RSSIDistanceToString(RSSIDistance distance)
+inline const char* RSSIDistanceToString(RSSIDistance distance)
 {
     switch (distance)
     {

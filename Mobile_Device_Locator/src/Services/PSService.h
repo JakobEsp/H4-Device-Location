@@ -4,7 +4,7 @@
 #include <WiFi.h>
 #include <esp_wifi.h>
 
-class PSService {
+class PromService {
     public:
         static void promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t type);
         static void setup();

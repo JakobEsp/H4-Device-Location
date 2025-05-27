@@ -1,6 +1,6 @@
 #include "PSService.h"
-int PSService::channel = 1;
-void PSService::promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t type)
+int PromService::channel = 1;
+void PromService::promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t type)
 {
     if (type != WIFI_PKT_MGMT)
     {
@@ -32,7 +32,7 @@ void PSService::promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t 
     Serial.println();
 }
 
-void PSService::setPromiscuousMode(bool enable)
+void PromService::setPromiscuousMode(bool enable)
 {
     if (enable)
     {
@@ -45,7 +45,7 @@ void PSService::setPromiscuousMode(bool enable)
     }
 }
 
-void PSService::setup()
+void PromService::setup()
 {
     WiFi.mode(WIFI_MODE_STA);
     Serial.println("Setting up promiscuous mode...");
@@ -58,14 +58,14 @@ void PSService::setup()
     esp_wifi_start();
 }
 
-int PSService::getChannel()
+int PromService::getChannel()
 {
-    return PSService::channel;
+    return PromService::channel;
 }
 
-void PSService::incrementChannel()
+void PromService::incrementChannel()
 {
-    PSService::channel = (PSService::channel + 1) % 14;
-    if (PSService::channel == 0)
-        PSService::channel = 1;
+    PromService::channel = (PromService::channel + 1) % 14;
+    if (PromService::channel == 0)
+        PromService::channel = 1;
 }

@@ -10,7 +10,7 @@ public:
     static void send(WSData &data);
 
 private:
-    static void onMessage(WebsocketsMessage message);
+    // static void onMessage(WebsocketsMessage message);
     static void onEvent(WebsocketsEvent event, String data);
     static WebsocketsClient instance;
 };

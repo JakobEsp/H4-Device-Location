@@ -10,5 +10,8 @@ void setup() {
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+
+  PSService::incrementChannel();
+  delay(1000); // wait for 1 second
+  esp_wifi_set_channel(PSService::getChannel(), WIFI_SECOND_CHAN_NONE);
 }

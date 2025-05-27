@@ -1,29 +1,35 @@
 #include "PSService.h"
-
+int PSService::channel = 1;
 void PSService::promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t type)
 {
-    if (type == WIFI_PKT_MGMT)
+    if (type != WIFI_PKT_MGMT)
     {
-        wifi_promiscuous_pkt_t *pkt = (wifi_promiscuous_pkt_t *)buf;
-        if (pkt->rx_ctrl.rssi > -70)
-        {
-            Serial.println("Fine signal strength detected.");
-            Serial.printf("Management frame: %d bytes, RSSI: %d Payload: %u\n", pkt->rx_ctrl.sig_len, pkt->rx_ctrl.rssi, pkt->payload);
-            return;
-        }
+        return;
     }
-    else if (type == WIFI_PKT_CTRL)
-    {
-        Serial.println("Control frame detected.");
-    }
-    else if (type == WIFI_PKT_DATA)
-    {
-        Serial.println("Data frame detected.");
-    }
-    else
-    {
-        Serial.println("Unknown packet type.");
-    }
+    wifi_promiscuous_pkt_t *pkt = (wifi_promiscuous_pkt_t *)buf;
+
+    // if (pkt->rx_ctrl.rssi <= -70)
+    // {
+    //     return;
+    // }
+
+    // Serial.printf("Management frame: %d bytes, RSSI: %d Payload: %u\n",
+    //               pkt->rx_ctrl.sig_len, pkt->rx_ctrl.rssi, pkt->payload);
+
+    uint8_t *payload = pkt->payload;
+
+    // The source MAC address is at byte offset 10 (802.11 header):
+    uint8_t *src_mac = &payload[10];
+    // The source MAC address is at byte offset 10 (802.11 header):
+    char macStr[18];
+    snprintf(macStr, sizeof(macStr), "%02X:%02X:%02X:%02X:%02X:%02X",
+             src_mac[0], src_mac[1], src_mac[2],
+             src_mac[3], src_mac[4], src_mac[5]);
+    if (strstr(macStr, "44") != nullptr)
+        return;
+    printf("Channel: %d Source MAC: %s\n", pkt->rx_ctrl.channel, macStr);
+
+    Serial.println();
 }
 
 void PSService::setPromiscuousMode(bool enable)
@@ -39,7 +45,6 @@ void PSService::setPromiscuousMode(bool enable)
     }
 }
 
-
 void PSService::setup()
 {
     WiFi.mode(WIFI_MODE_STA);
@@ -50,8 +55,17 @@ void PSService::setup()
     Serial.println("Registering promiscuous callback...");
     esp_wifi_set_promiscuous_rx_cb(promiscuousSniffCallback);
     Serial.println("Callback registered.");
-    wifi_scan_config_t config = {
-        .scan_type = WIFI_SCAN_TYPE_ACTIVE,
-    };
-    esp_wifi_scan_start(&config, true);
+    esp_wifi_start();
+}
+
+int PSService::getChannel()
+{
+    return PSService::channel;
+}
+
+void PSService::incrementChannel()
+{
+    PSService::channel = (PSService::channel + 1) % 14;
+    if (PSService::channel == 0)
+        PSService::channel = 1;
 }

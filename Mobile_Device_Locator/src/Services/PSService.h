@@ -8,6 +8,10 @@ class PSService {
     public:
         static void promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_t type);
         static void setup();
+        static void incrementChannel();
+        
+        static int getChannel();
         private:
-        static void setPromiscuousMode(bool enable = true);    
+            static void setPromiscuousMode(bool enable = true);
+            static int channel; 
 };

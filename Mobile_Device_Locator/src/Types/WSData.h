@@ -28,7 +28,7 @@ public:
         strcpy(hwid, id);
     }
 
-    const char* convertTime()
+    const char *convertTime()
     {
         static char timeStr[20];
         uint32_t timestamp = pkt->rx_ctrl.timestamp / 1000000; // Convert microseconds to seconds
@@ -71,5 +71,5 @@ public:
 private:
     char *macAddress;
     wifi_promiscuous_pkt_t *pkt;
-    static char* hwid;
+    static char *hwid;
 };

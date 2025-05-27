@@ -48,13 +48,10 @@ void PromService::setPromiscuousMode(bool enable)
 void PromService::setup()
 {
     WiFi.mode(WIFI_MODE_STA);
-    Serial.println("Setting up promiscuous mode...");
     setPromiscuousMode();
-    Serial.println("Promiscuous mode set up complete.");
 
-    Serial.println("Registering promiscuous callback...");
     esp_wifi_set_promiscuous_rx_cb(promiscuousSniffCallback);
-    Serial.println("Callback registered.");
+    Serial.println("Promiscuous setup done!");
     esp_wifi_start();
 }
 

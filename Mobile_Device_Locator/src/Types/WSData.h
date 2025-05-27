@@ -4,8 +4,9 @@
 #include <esp_wifi_types.h>
 #include <string.h>
 #include <time.h>
-#include "Unix.h"
 #include <Services/NTPService.h>
+#include "RSSIDistance.h"
+
 class WSData
 {
 public:

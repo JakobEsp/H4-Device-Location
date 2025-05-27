@@ -1,13 +1,17 @@
+#pragma once
+
 #include <cstdint>
 #include <esp_wifi_types.h>
 #include <string.h>
 #include <time.h>
+#include "Unix.h"
+#include <Services/NTPService.h>
 class WSData
 {
 public:
-    WSData(wifi_promiscuous_pkt_t *pkt)
+    WSData(wifi_promiscuous_pkt_t *values)
     {
-        this->pkt = pkt;
+        this->pkt = values;
         macAddress = new char[18]; // 17 characters + null terminator
         uint8_t *payload = pkt->payload;
 
@@ -16,6 +20,8 @@ public:
         snprintf(macAddress, 18, "%02X:%02X:%02X:%02X:%02X:%02X",
                  src_mac[0], src_mac[1], src_mac[2],
                  src_mac[3], src_mac[4], src_mac[5]);
+            
+        // this->pkt->rx_ctrl.timestamp = Unix::getTimestamp(); 
     }
 
     static void setHwid(const char *id)
@@ -31,10 +37,17 @@ public:
     const char *convertTime()
     {
         static char timeStr[20];
-        uint32_t timestamp = pkt->rx_ctrl.timestamp / 1000000; // Convert microseconds to seconds
+        struct tm* timeinfo = NTPService::getTime();
+        if (!timeinfo)
+        {
+            return "Time not available";
+        }
+        
+        uint64_t timestamp = mktime(timeinfo) + (pkt->rx_ctrl.timestamp / 1000000); // Convert microseconds to seconds
         struct tm *tm_info;
         tm_info = localtime((time_t *)&timestamp);
         strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", tm_info);
+        delete timeinfo; // Clean up the allocated memory for timeinfo
         return timeStr;
     }
 
@@ -46,6 +59,7 @@ public:
                 "\"macAddress\":\"%s\","
                 "\"channel\":%d,"
                 "\"rssi\":%d,"
+                "\"rssi_type\": \"%s\","
                 "\"sig_len\":%d,"
                 "\"timestamp\":%u,"
                 "\"time\":\"%s\","
@@ -54,6 +68,7 @@ public:
                 macAddress,
                 pkt->rx_ctrl.channel,
                 pkt->rx_ctrl.rssi,
+                RSSIDistanceToString((RSSIDistance)pkt->rx_ctrl.rssi),
                 pkt->rx_ctrl.sig_len,
                 pkt->rx_ctrl.timestamp,
                 convertTime(),

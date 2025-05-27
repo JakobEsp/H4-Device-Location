@@ -22,7 +22,6 @@ void NetworkService::disconnect() {
     }
 }
 
-wl_status_t NetworkService::status() {
-    wl_status_t status = WiFi.status();
-    return status; // Return the status for further processing if needed
+bool NetworkService::isConnected() {
+    return WiFi.status() == wl_status_t::WL_CONNECTED; // Return the status for further processing if needed
 }

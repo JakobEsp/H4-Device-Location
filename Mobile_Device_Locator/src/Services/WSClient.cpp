@@ -3,7 +3,7 @@
 #include "NetworkService.h"
 
 // ws://172.22.224.1:3000/_ws
-const char ip[] = "172.22.224.1";
+const char ip[] = "192.168.0.102";
 const int port = 3000;
 const char path[] = "/_ws";
 WebsocketsClient WSClient::instance;
@@ -28,7 +28,9 @@ void WSClient::setup()
 
 void WSClient::send(WSData &data)
 {
-    instance.send(data.toJson());
+    if (!instance.send(data.toJson())) {
+        Serial.println("Failed to send data over WebSocket");
+    }
 }
 
 void WSClient::onEvent(WebsocketsEvent event, String data)

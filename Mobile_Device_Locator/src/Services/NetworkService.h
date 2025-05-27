@@ -9,5 +9,5 @@ class NetworkService {
     public: 
         static void connect();
         static void disconnect();
-        static wl_status_t status();
+        static bool isConnected();
 };

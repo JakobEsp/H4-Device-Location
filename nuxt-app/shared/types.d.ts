@@ -10,3 +10,16 @@ declare interface WebsocketData {
   hwid: string;
 }
 
+declare interface Device {
+  id: string;
+  x: number;
+  y: number;
+  timestamp: number;
+}
+
+declare interface Beacon {
+  hwid: string;
+  x: number;
+  y: number;
+}
+

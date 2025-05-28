@@ -15,3 +15,5 @@ const beacon: Beacon[] = [
     y: 50
   }
 ]
+
+export default beacon;

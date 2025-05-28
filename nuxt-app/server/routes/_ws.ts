@@ -4,6 +4,7 @@ let numberOfRequests = 0;
 const num = ref(0);
 const wsReadings = "readings";
 
+
 const readings: Record<string, WebsocketData[]> = {}
 
 export default defineWebSocketHandler({
@@ -13,7 +14,10 @@ export default defineWebSocketHandler({
 
   message(peer, message) {
 
+    // Handle message type - esp info or esp reading
+    
     // save data until there is messages all esp's with the same id / mac in a reasonable timeframe 
+    
     // use Trilateration to get the ca geolocation of the device based on esp geolocation
     // Transform the data to x, y and id
 

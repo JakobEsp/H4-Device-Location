@@ -5,6 +5,10 @@ let numberOfRequests = 0;
 const num = ref(0);
 const wsReadings = "readings";
 
+const DeviceIds: Record<string, string> = {
+}
+
+const devices: Device[] = [] 
 
 const readings: Readings = {
   beacon1: [],
@@ -30,6 +34,8 @@ export default defineWebSocketHandler({
     console.log("[ws] readings", readings);
     if(checkReadings(readings, reading.macAddress)) {
       console.log("[ws] All readings received for macAddress:", reading.macAddress);
+      
+
     }
     
     // save data until there is messages all esp's with the same id / mac in a reasonable timeframe 

@@ -1,4 +1,6 @@
 
+declare type Hwid = 'beacon1' | 'beacon2' | 'beacon3';
+
 declare interface WebsocketData {
   macAddress: string;
   channel: number;
@@ -7,7 +9,7 @@ declare interface WebsocketData {
   sig_len: number;
   timestamp: number;
   time: string;
-  hwid: string;
+  hwid: Hwid;
 }
 
 declare interface Device {
@@ -18,8 +20,9 @@ declare interface Device {
 }
 
 declare interface Beacon {
-  hwid: string;
+  hwid: Hwid;
   x: number;
   y: number;
 }
 
+declare type Readings = Record<Hwid, WebsocketData[]>;

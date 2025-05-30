@@ -1,11 +1,16 @@
 import { ref } from "vue";
+import checkReadings from "../utils/checkReadings";
 
 let numberOfRequests = 0;
 const num = ref(0);
 const wsReadings = "readings";
 
 
-const readings: Record<string, WebsocketData[]> = {}
+const readings: Readings = {
+  beacon1: [],
+  beacon2: [],
+  beacon3: []
+}
 
 export default defineWebSocketHandler({
   open(peer) {
@@ -15,10 +20,21 @@ export default defineWebSocketHandler({
   message(peer, message) {
 
     // Handle message type - esp info or esp reading
+    const reading: WebsocketData = JSON.parse(message.text());
+    
+    //if reading[hwid] already has a reading with reading.mac Address, remove the old reading
+    if (readings[reading.hwid].some(r => r.macAddress === reading.macAddress)) {
+      readings[reading.hwid] = readings[reading.hwid].filter(r => r.macAddress !== reading.macAddress);
+    }
+    readings[reading.hwid].push(reading);
+    console.log("[ws] readings", readings);
+    if(checkReadings(readings, reading.macAddress)) {
+      console.log("[ws] All readings received for macAddress:", reading.macAddress);
+    }
     
     // save data until there is messages all esp's with the same id / mac in a reasonable timeframe 
     
-    // use Trilateration to get the ca geolocation of the device based on esp geolocation
+    // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     // Transform the data to x, y and id
 
     console.log("[ws] message", message);

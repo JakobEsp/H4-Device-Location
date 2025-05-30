@@ -1,4 +1,5 @@
-const beacon: Beacon[] = [
+
+const beacons: Beacon[] = [
   {
     hwid: 'beacon1',
     x: 50,
@@ -16,4 +17,4 @@ const beacon: Beacon[] = [
   }
 ]
 
-export default beacon;
+export default beacons;

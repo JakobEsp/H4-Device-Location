@@ -1,9 +1,11 @@
 
-
+// returns readings if there are 3  
 export default function(readings: Readings, macAddress: string) {
-
-  // check if every key on readings has at least one reading with the same macAddress
-  return Object.values(readings).every((readingArray) => {
-    return readingArray.some(reading => reading.macAddress === macAddress);
-  });
+  const matches = Object.values(readings)
+    .flat()
+    .filter(reading => reading.macAddress === macAddress);
+    if(matches.length > 3){
+      console.error("OVER 3!?! THis should not be possible get good fr fr ong")
+    }
+  return matches.length === 3 ? matches : null;
 }

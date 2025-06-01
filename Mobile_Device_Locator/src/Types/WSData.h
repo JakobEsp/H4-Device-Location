@@ -6,10 +6,13 @@
 #include <time.h>
 #include <Services/NTPService.h>
 #include "RSSIDistance.h"
+#include <Services/HashService.h>
 
 class WSData
 {
 public:
+
+    
     WSData(wifi_promiscuous_pkt_t *values)
     {
         this->pkt = values;
@@ -21,40 +24,45 @@ public:
         snprintf(macAddress, 18, "%02X:%02X:%02X:%02X:%02X:%02X",
                  src_mac[0], src_mac[1], src_mac[2],
                  src_mac[3], src_mac[4], src_mac[5]);
-            
-        // this->pkt->rx_ctrl.timestamp = Unix::getTimestamp(); 
+        // this->pkt->rx_ctrl.timestamp = Unix::getTimestamp();
     }
 
-    static void setHwid(const char *id)
+    static void setHwid()
     {
         if (hwid)
         {
-            delete[] hwid;
+            return;
         }
-        hwid = new char[strlen(id) + 1];
-        strcpy(hwid, id);
+        hwid = ESP.getEfuseMac();
     }
 
     const char *convertTime()
     {
         static char timeStr[20];
-        struct tm* timeinfo = NTPService::getTime();
+        struct tm *timeinfo = NTPService::getTime();
         if (!timeinfo)
         {
             return "Time not available";
         }
-        
+        setHwid(); // Ensure hwid is set before using it
+
         uint64_t timestamp = mktime(timeinfo) + (pkt->rx_ctrl.timestamp / 1000000); // Convert microseconds to seconds
         struct tm *tm_info;
         tm_info = localtime((time_t *)&timestamp);
         strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", tm_info);
         delete timeinfo; // Clean up the allocated memory for timeinfo
+        this->pkt->rx_ctrl.timestamp = timestamp;
         return timeStr;
     }
 
     const char *toJson()
     {
         static char json[256];
+        if (!pkt)
+        {
+            return "{\"error\":\"No packet data available\"}";
+        }
+
         sprintf(json,
                 "{"
                 "\"macAddress\":\"%s\","
@@ -64,16 +72,16 @@ public:
                 "\"sig_len\":%d,"
                 "\"timestamp\":%u,"
                 "\"time\":\"%s\","
-                "\"hwid\":\"%s\""
+                "\"hwid\":%012llx"
                 "}",
-                macAddress,
+                HashService::hashMACAddress(macAddress),
                 pkt->rx_ctrl.channel,
                 pkt->rx_ctrl.rssi,
                 RSSIDistanceToString((RSSIDistance)pkt->rx_ctrl.rssi),
                 pkt->rx_ctrl.sig_len,
                 pkt->rx_ctrl.timestamp,
                 convertTime(),
-                hwid ? hwid : "unknown");
+                hwid ? hwid : 0);
         return json;
     }
 
@@ -87,5 +95,5 @@ public:
 private:
     char *macAddress;
     wifi_promiscuous_pkt_t *pkt;
-    static char *hwid;
+    static uint64_t hwid;
 };

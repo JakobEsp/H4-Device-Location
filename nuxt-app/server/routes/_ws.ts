@@ -46,23 +46,21 @@ export default defineWebSocketHandler({
     // Transform the data to x, y and id
 
     const id = Object.keys(DeviceIds).length + 1;
+    const device: Device = {
+      id: id.toString(),
+      x: coordinates.x,
+      y: coordinates.y,
+      timestamp: Date.now(),
+    }
 
-
+    peer.publish("devices", device);
+    devices.push(device);
 
     console.log("[ws] message", message);
     num.value++;
     console.log("[ws] num.value", num.value); 
     numberOfRequests++;
     console.log("[ws] numberOfRequests", numberOfRequests);
-
-    // const data: WebsocketData = JSON.parse(message.text());
-
-    // if (!readings[data.hwid]) {
-    //   readings[data.hwid] = [];
-    // }else {
-    //   console.log("No hardware id get good")
-    // }
-    // peer.publish(wsReadings, num.value);
   },
 
   close(peer, event) {

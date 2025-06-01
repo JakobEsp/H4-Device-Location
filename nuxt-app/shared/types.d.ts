@@ -12,15 +12,16 @@ declare interface WebsocketData {
   hwid: Hwid;
 }
 
-declare interface Device {
+declare interface Device extends Coordinates{
   id: string;
-  x: number;
-  y: number;
   timestamp: number;
 }
 
-declare interface Beacon {
+declare interface Beacon extends Coordinates {
   hwid: Hwid;
+}
+
+declare interface Coordinates {
   x: number;
   y: number;
 }

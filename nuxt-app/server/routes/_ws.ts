@@ -19,14 +19,14 @@ const readings: Readings = {
 
 export default defineWebSocketHandler({
   open(peer) {
-    // console.log("[ws] open", peer);
+    console.log("[ws] open");
   },
 
   message(peer, message) {
 
     // Handle message type - esp info or esp reading
     const reading: WebsocketData = JSON.parse(message.text());
-    
+    console.log("[ws] message", reading);
     //TODO: add a time check to remove readings that are too old
     //if reading[hwid] already has a reading with reading.mac Address, remove the old reading
     if (readings[reading.hwid].some(r => r.macAddress === reading.macAddress)) {
@@ -37,6 +37,9 @@ export default defineWebSocketHandler({
     console.log("[ws] readings", readings);
     const validReadings = checkReadings(readings, reading.macAddress);
     if(!validReadings) return;
+    readings.beacon1 = readings.beacon1.filter(r => r.macAddress !== reading.macAddress);
+    readings.beacon2 = readings.beacon2.filter(r => r.macAddress !== reading.macAddress);
+    readings.beacon3 = readings.beacon3.filter(r => r.macAddress !== reading.macAddress);
     console.log("[ws] validReadings", validReadings);
     // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     const coordinates = calculateXY(validReadings);

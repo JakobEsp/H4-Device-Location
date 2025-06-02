@@ -37,9 +37,7 @@ export default defineWebSocketHandler({
     console.log("[ws] readings", readings);
     const validReadings = checkReadings(readings, reading.macAddress);
     if(!validReadings) return;
-    readings.beacon1 = readings.beacon1.filter(r => r.macAddress !== reading.macAddress);
-    readings.beacon2 = readings.beacon2.filter(r => r.macAddress !== reading.macAddress);
-    readings.beacon3 = readings.beacon3.filter(r => r.macAddress !== reading.macAddress);
+    removeReadings(reading.macAddress);
     console.log("[ws] validReadings", validReadings);
     // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     const coordinates = calculateXY(validReadings);
@@ -75,3 +73,9 @@ export default defineWebSocketHandler({
   },
 });
 
+function removeReadings(macAddress: string) {
+  Object.keys(readings).forEach(hwid => {
+    console.log("Yeah yeah")
+    readings[hwid as Hwid] = readings[hwid as Hwid].filter(r => r.macAddress !== macAddress);
+  });
+}

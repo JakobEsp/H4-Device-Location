@@ -1,17 +1,17 @@
 
 const beacons: Beacon[] = [
   {
-    hwid: 'beacon1',
+    hwid: '00555bf66870',
     x: 0,
     y: 0
   },
   {
-    hwid: 'beacon2',
+    hwid: '8cf585c964ec',
     x: 0,
     y: 400
   },
   {
-    hwid: 'beacon3',
+    hwid: '6407Iea7dbcc',
     x: 600,
     y: 0
   }

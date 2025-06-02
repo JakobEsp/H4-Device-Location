@@ -10,6 +10,7 @@ import beacons from "~/shared/beacons";
 
 export default function(readings: WebsocketData[]){
   if(readings.length != 3)return null;
+  console.log("Calculating coordinates from readings:", readings);
   // Get the xy locations of the device reading based on the distance to the beacons in rssi
   const coordinates: Coordinates = { x: 0, y: 0 };
   const distances = readings.map(reading => {
@@ -19,7 +20,7 @@ export default function(readings: WebsocketData[]){
     // Convert RSSI to distance using a simplified model
     // Assuming TxPower is -59 dBm for the beacons
     // txPower is the estimated RSSI value at 1 meter distance
-    const txPower = -59;
+    const txPower = -40;
     const n = 2; // Path-loss exponent, typically between 2 and 4
     const distance = Math.pow(10, (txPower - reading.rssi) / (10 * n));
     
@@ -30,7 +31,7 @@ export default function(readings: WebsocketData[]){
 
   // Extract beacon positions and distances
   const [a, b, c] = distances as { beacon: { x: number, y: number }, distance: number }[];
-
+  console.log("Distances and beacons:", distances);
   // Trilateration equations
   // x,y and radius of the circles
   const x1 = a.beacon.x, y1 = a.beacon.y, r1 = a.distance;
@@ -44,13 +45,14 @@ export default function(readings: WebsocketData[]){
   const A = 2 * (x2 - x1); // Difference in x between beacon 2 and 1, scaled
   const B = 2 * (y2 - y1); // Difference in y between beacon 2 and 1, scaled
   const C = r1 * r1 - r2 * r2 - x1 * x1 + x2 * x2 - y1 * y1 + y2 * y2; // Constant term for first equation
-
+  console.log("A, B, C:", A, B, C);
   const D = 2 * (x3 - x2); // Difference in x between beacon 3 and 2, scaled
   const E = 2 * (y3 - y2); // Difference in y between beacon 3 and 2, scaled
   const F = r2 * r2 - r3 * r3 - x2 * x2 + x3 * x3 - y2 * y2 + y3 * y3; // Constant term for second equation
-
+  console.log("D, E, F:", D, E, F);
   // Calculate the denominator for solving the linear system (should not be zero to avoid division by zero)
   const denominator = (A * E - B * D);
+  console.log("Denominator:", denominator);
   if (denominator === 0) return null; // If denominator is zero, the beacons are collinear or too close, so no unique solution
 
   // Solve for x coordinate using Cramer's rule for linear equations

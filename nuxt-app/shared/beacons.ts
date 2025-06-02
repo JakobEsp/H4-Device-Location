@@ -2,18 +2,18 @@
 const beacons: Beacon[] = [
   {
     hwid: 'beacon1',
-    x: 50,
-    y: 50
+    x: 0,
+    y: 0
   },
   {
     hwid: 'beacon2',
-    x: 60,
-    y: 350
+    x: 0,
+    y: 400
   },
   {
     hwid: 'beacon3',
-    x: 560,
-    y: 50
+    x: 600,
+    y: 0
   }
 ]
 

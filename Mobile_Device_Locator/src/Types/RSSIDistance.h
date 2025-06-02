@@ -10,17 +10,28 @@ enum RSSIDistance
 
 inline const char* RSSIDistanceToString(RSSIDistance distance)
 {
-    switch (distance)
+    if (distance > VERY_CLOSE)
     {
-    case VERY_CLOSE:
         return "Very Close";
-    case CLOSE:
+    }
+
+    else if (distance > CLOSE)
+    {
         return "Close";
-    case NEAR:
+    }
+
+    else if (distance > NEAR)
+    {
         return "Near";
-    case FAR:
+    }
+
+    else if (distance > FAR)
+    {
         return "Far";
-    default:
+    }
+
+    else
+    {
         return "Unknown";
     }
 }

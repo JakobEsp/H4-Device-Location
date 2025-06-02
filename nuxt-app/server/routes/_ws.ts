@@ -13,8 +13,8 @@ const DeviceIds: Record<string, string> = {
 const devices: Device[] = [] 
 
 const readings: Readings = {
-  "6407Iea7dbcc": [],
-  "00555bf66870": [],
+  "64071ea7dbcc": [],
+  "00555bf6b870": [],
   "8cf585c964ec": []
 }
 
@@ -26,7 +26,7 @@ export default defineWebSocketHandler({
   },
 
   message(peer, message) {
-    // console.log("[ws] message", message.text());
+    console.log("[ws] message", message.text());
 
     // numberOfRequests++;
     // console.log("[ws] numberOfRequests", numberOfRequests);

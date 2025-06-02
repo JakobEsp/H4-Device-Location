@@ -1,5 +1,5 @@
 
-declare type Hwid = "6407Iea7dbcc" | "00555bf66870" | "8cf585c964ec";
+declare type Hwid = "64071ea7dbcc" | "00555bf6b870" | "8cf585c964ec";
 
 declare interface WebsocketData {
   macAddress: number;

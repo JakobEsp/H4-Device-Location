@@ -8,7 +8,7 @@ let message: WebsocketData = {
   sig_len: 8,
   timestamp: Date.now(),
   time: new Date().toISOString(),
-  hwid: "00555bf66870"
+  hwid: "00555bf6b870"
 }
 
 const ws = new WebSocket('ws://192.168.0.102:3000/_ws');

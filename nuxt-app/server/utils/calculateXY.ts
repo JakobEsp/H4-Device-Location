@@ -20,8 +20,8 @@ export default function(readings: WebsocketData[]){
     // Convert RSSI to distance using a simplified model
     // Assuming TxPower is -59 dBm for the beacons
     // txPower is the estimated RSSI value at 1 meter distance
-    const txPower = -40;
-    const n = 2; // Path-loss exponent, typically between 2 and 4
+    const txPower = -20;
+    const n = 4; // Path-loss exponent, typically between 2 and 4
     const distance = Math.pow(10, (txPower - reading.rssi) / (10 * n));
     
     return { beacon, distance };
@@ -55,10 +55,15 @@ export default function(readings: WebsocketData[]){
   console.log("Denominator:", denominator);
   if (denominator === 0) return null; // If denominator is zero, the beacons are collinear or too close, so no unique solution
 
-  // Solve for x coordinate using Cramer's rule for linear equations
-  coordinates.x = (C * E - F * B) / denominator;
-  // Solve for y coordinate using Cramer's rule for linear equations
-  coordinates.y = (A * F - D * C) / denominator;
+  // Solve for x and y using Cramer's rule for linear equations
+  const rawX = (C * E - F * B) / denominator;
+  const rawY = (A * F - D * C) / denominator;
+
+  // Transform so that x=300 maps to 0, x<300 maps to negative, x>300 maps to positive, scaled to 0-600
+  // and y=200 maps to 0, y<200 maps to negative, y>200 maps to positive, scaled to 0-400
+  // (rawX - 300) / 1 * 600 for x, (rawY - 200) / 1 * 400 for y
+  coordinates.x = (rawX - 300) * 600;
+  coordinates.y = (rawY - 200) * 400;
 
   return coordinates;
 }

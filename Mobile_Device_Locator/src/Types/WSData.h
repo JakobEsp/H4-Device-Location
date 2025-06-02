@@ -7,12 +7,11 @@
 #include <Services/NTPService.h>
 #include "RSSIDistance.h"
 #include <Services/HashService.h>
+#include <Esp.h>
 
 class WSData
 {
 public:
-
-    
     WSData(wifi_promiscuous_pkt_t *values)
     {
         this->pkt = values;
@@ -44,7 +43,7 @@ public:
         {
             return "Time not available";
         }
-        setHwid(); // Ensure hwid is set before using it
+        // setHwid(); 
 
         uint64_t timestamp = mktime(timeinfo) + (pkt->rx_ctrl.timestamp / 1000000); // Convert microseconds to seconds
         struct tm *tm_info;
@@ -62,17 +61,20 @@ public:
         {
             return "{\"error\":\"No packet data available\"}";
         }
+        // %012llx
+        static char c_hwid[32];
+        sprintf(c_hwid, "%012llx", hwid);
 
         sprintf(json,
                 "{"
-                "\"macAddress\":\"%s\","
+                "\"macAddress\":%d,"
                 "\"channel\":%d,"
                 "\"rssi\":%d,"
                 "\"rssi_type\": \"%s\","
                 "\"sig_len\":%d,"
                 "\"timestamp\":%u,"
                 "\"time\":\"%s\","
-                "\"hwid\":%012llx"
+                "\"hwid\":\"%s\""
                 "}",
                 HashService::hashMACAddress(macAddress),
                 pkt->rx_ctrl.channel,
@@ -81,7 +83,7 @@ public:
                 pkt->rx_ctrl.sig_len,
                 pkt->rx_ctrl.timestamp,
                 convertTime(),
-                hwid ? hwid : 0);
+                c_hwid);
         return json;
     }
 

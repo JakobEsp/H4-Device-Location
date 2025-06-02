@@ -1,3 +1,3 @@
 #include "WSData.h"
 
-char* WSData::hwid = nullptr;
+uint64_t WSData::hwid = ESP.getEfuseMac();

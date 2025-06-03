@@ -24,6 +24,8 @@ public:
                  src_mac[0], src_mac[1], src_mac[2],
                  src_mac[3], src_mac[4], src_mac[5]);
         // this->pkt->rx_ctrl.timestamp = Unix::getTimestamp();
+        setHwid();
+        
     }
 
     static void setHwid()
@@ -35,6 +37,10 @@ public:
         hwid = ESP.getEfuseMac();
     }
 
+    int getChannel() const {
+        return pkt->rx_ctrl.channel;
+    }
+
     const char *convertTime()
     {
         static char timeStr[20];
@@ -43,14 +49,12 @@ public:
         {
             return "Time not available";
         }
-        // setHwid(); 
 
         uint64_t timestamp = mktime(timeinfo) + (pkt->rx_ctrl.timestamp / 1000000); // Convert microseconds to seconds
         struct tm *tm_info;
         tm_info = localtime((time_t *)&timestamp);
         strftime(timeStr, sizeof(timeStr), "%Y-%m-%d %H:%M:%S", tm_info);
         delete timeinfo; // Clean up the allocated memory for timeinfo
-        this->pkt->rx_ctrl.timestamp = timestamp;
         return timeStr;
     }
 
@@ -67,21 +71,21 @@ public:
 
         sprintf(json,
                 "{"
-                "\"macAddress\":%d,"
+                "\"macAddress\":%llu,"
                 "\"channel\":%d,"
                 "\"rssi\":%d,"
                 "\"rssi_type\": \"%s\","
                 "\"sig_len\":%d,"
-                "\"timestamp\":%u,"
+                "\"timestamp\":%llu,"
                 "\"time\":\"%s\","
                 "\"hwid\":\"%s\""
                 "}",
-                HashService::hashMACAddress(macAddress),
+                (unsigned long long)HashService::hashMACAddress(macAddress),
                 pkt->rx_ctrl.channel,
                 pkt->rx_ctrl.rssi,
                 RSSIDistanceToString((RSSIDistance)pkt->rx_ctrl.rssi),
                 pkt->rx_ctrl.sig_len,
-                pkt->rx_ctrl.timestamp,
+                (unsigned long long)pkt->rx_ctrl.timestamp,
                 convertTime(),
                 c_hwid);
         return json;

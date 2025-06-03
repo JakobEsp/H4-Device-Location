@@ -16,4 +16,5 @@ public:
 private:
     static void setPromiscuousMode(bool enable = true);
     static int channel;
+    static unsigned long lastSentPacketTime;
 };

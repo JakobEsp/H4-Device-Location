@@ -9,9 +9,9 @@
 
 void setup()
 {
-  Serial.begin(115200); // output serial to the serial monitor in terminal
+  Serial.begin(115200);      // output serial to the serial monitor in terminal
   NetworkService::connect(); // connect to the network
-  NTPService::setup(); // setup the NTP service to get the current time
+  NTPService::setup();       // setup the NTP service to get the current time
   WSClient::setup();         // setup the WebSocket client
   PromService::setup();
 }
@@ -19,6 +19,12 @@ void setup()
 void loop()
 {
   PromService::incrementChannel();
-  delay(1000); // wait for 1 second
-  esp_wifi_set_channel(PromService::getChannel(), WIFI_SECOND_CHAN_NONE);
+  delay(2500); // wait for 1 second
+  int channel = PromService::getChannel();
+  PromService::setup();
+  esp_err_t error = esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
+  if (error == ESP_OK)
+  {
+    Serial.printf("Channel set to: %d\n", PromService::getChannel());
+  }
 }

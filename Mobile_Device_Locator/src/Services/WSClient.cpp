@@ -28,13 +28,24 @@ void WSClient::setup()
 
 void WSClient::send(WSData &data)
 {
-    if (!instance.send(data.toJson())) {
+    if (!instance.available())
+    {
+        Serial.println("WebSocket ping failed, attempting to reconnect...");
+        delay(1000); // Wait for a second before retrying
+        setup();
+    }
+
+
+    Serial.printf("%s\n", data.toJson());
+    if (!instance.send(data.toJson()))
+    {
         Serial.println("Failed to send data over WebSocket");
     }
 }
 
 void WSClient::onEvent(WebsocketsEvent event, String data)
 {
+    Serial.printf("WebSocket event: %d, Data: %s\n", event, data.c_str());
     if (event == WebsocketsEvent::ConnectionOpened)
     {
         Serial.println("WebSocket connection opened");
@@ -42,5 +53,6 @@ void WSClient::onEvent(WebsocketsEvent event, String data)
     else if (event == WebsocketsEvent::ConnectionClosed)
     {
         Serial.println("WebSocket connection closed");
+        setup();
     }
 }

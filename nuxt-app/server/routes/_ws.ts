@@ -23,7 +23,11 @@ export default defineWebSocketHandler({
   },
 
   message(peer, message) {
+    if(!peer.websocket || peer.websocket.readyState !== WebSocket.OPEN) {
+      peer.terminate();
+    }
     console.log("[ws] message", message.text());
+    peer.send("pong");
     // Handle message type - esp info or esp reading
     const reading: WebsocketData = JSON.parse(message.text());
 
@@ -65,6 +69,7 @@ export default defineWebSocketHandler({
 
   close(peer, event) {
     console.log("[ws] close", peer, event);
+    peer.terminate();
   },
 
   error(peer, error) {

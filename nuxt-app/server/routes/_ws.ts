@@ -4,9 +4,6 @@ import calculateXY from "../utils/calculateXY";
 
 const subscribtion = "readings"
 
-let numberOfRequests = 0;
-const num = ref(0);
-
 const DeviceIds: Record<string, string> = {
 }
 

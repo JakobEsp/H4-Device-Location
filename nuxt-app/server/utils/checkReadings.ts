@@ -1,6 +1,6 @@
 
 // returns readings if there are 3  
-export default function(readings: Readings, macAddress: string) {
+export default function(readings: Readings, macAddress: WebsocketData["macAddress"]){
   const matches = Object.values(readings)
     .flat()
     .filter(reading => reading.macAddress === macAddress);

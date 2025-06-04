@@ -1,8 +1,8 @@
 
-declare type Hwid = 'beacon1' | 'beacon2' | 'beacon3';
+declare type Hwid = "64071ea7dbcc" | "00555bf6b870" | "8cf585c964ec";
 
 declare interface WebsocketData {
-  macAddress: string;
+  macAddress: number;
   channel: number;
   rssi: number;
   rssi_type: string;

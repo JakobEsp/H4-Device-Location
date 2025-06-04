@@ -2,9 +2,7 @@ import { ref } from "vue";
 import checkReadings from "../utils/checkReadings";
 import calculateXY from "../utils/calculateXY";
 
-let numberOfRequests = 0;
-const num = ref(0);
-const wsReadings = "readings";
+const subscribtion = "readings"
 
 const DeviceIds: Record<string, string> = {
 }
@@ -12,60 +10,66 @@ const DeviceIds: Record<string, string> = {
 const devices: Device[] = [] 
 
 const readings: Readings = {
-  beacon1: [],
-  beacon2: [],
-  beacon3: []
+  "64071ea7dbcc": [],
+  "00555bf6b870": [],
+  "8cf585c964ec": []
 }
 
 export default defineWebSocketHandler({
+
   open(peer) {
     console.log("[ws] open");
+    peer.subscribe(peer.websocket.url ?? subscribtion);
   },
 
   message(peer, message) {
-
+    if(!peer.websocket || peer.websocket.readyState !== WebSocket.OPEN) {
+      peer.terminate();
+    }
+    console.log("[ws] message", message.text());
+    peer.send("pong");
     // Handle message type - esp info or esp reading
     const reading: WebsocketData = JSON.parse(message.text());
-    console.log("[ws] message", reading);
+
     //TODO: add a time check to remove readings that are too old
     //if reading[hwid] already has a reading with reading.mac Address, remove the old reading
     if (readings[reading.hwid].some(r => r.macAddress === reading.macAddress)) {
       readings[reading.hwid] = readings[reading.hwid].filter(r => r.macAddress !== reading.macAddress);
     }
-    // save data until there is messages all esp's with the same id / mac in a reasonable timeframe 
+    // save data until there is messages all esp's with the same macAddress
     readings[reading.hwid].push(reading);
-    console.log("[ws] readings", readings);
+
     const validReadings = checkReadings(readings, reading.macAddress);
+    console.log("[ws] valid readings", validReadings);
     if(!validReadings) return;
+    // if(!validTimeFrame(validReadings as [WebsocketData, WebsocketData, WebsocketData])){
+    //   return;
+    // }
     removeReadings(reading.macAddress);
-    console.log("[ws] validReadings", validReadings);
     // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     const coordinates = calculateXY(validReadings);
     if(!coordinates) return;
-    console.log("[ws] coordinates", coordinates);
-
-    // Transform the data to x, y and id
-
-    const id = Object.keys(DeviceIds).length + 1;
-    const device: Device = {
-      id: id.toString(),
-      x: coordinates.x,
-      y: coordinates.y,
-      timestamp: Date.now(),
-    }
-
-    peer.publish("devices", device);
-    devices.push(device);
-
-    console.log("[ws] message", message);
-    num.value++;
-    console.log("[ws] num.value", num.value); 
-    numberOfRequests++;
-    console.log("[ws] numberOfRequests", numberOfRequests);
+    // Transform the data to type Device
+      try {
+        const id = DeviceIds[reading.macAddress] ?? Object.keys(DeviceIds).length + 1;
+        const device: Device = {
+          id: id.toString(),
+          x: coordinates.x,
+          y: coordinates.y,
+          timestamp: Date.now(),
+        }
+        
+        devices.push(device);
+        peer.publish(peer.websocket.url ?? subscribtion, JSON.stringify(device));
+        peer.send(JSON.stringify(device));
+      }catch(error){
+        console.error("[ws] error publishing device", error);
+      }
   },
 
   close(peer, event) {
     console.log("[ws] close", peer, event);
+    peer.terminate();
   },
 
   error(peer, error) {
@@ -73,9 +77,23 @@ export default defineWebSocketHandler({
   },
 });
 
-function removeReadings(macAddress: string) {
+function removeReadings(macAddress: WebsocketData["macAddress"]) {
   Object.keys(readings).forEach(hwid => {
-    console.log("Yeah yeah")
     readings[hwid as Hwid] = readings[hwid as Hwid].filter(r => r.macAddress !== macAddress);
   });
+}
+
+function validTimeFrame(validReadings: [WebsocketData, WebsocketData, WebsocketData]){
+  // Check if the readings are within a valid time frame, last 60 seconds
+  const now = Date.now();
+  const invalidReadings = validReadings.filter(reading => now - reading.timestamp > 60 * 1000);
+  if(invalidReadings.length > 0){
+    console.warn("[ws] invalid readings, too old", invalidReadings);
+    // Remove invalid readings from readings
+    invalidReadings.forEach(reading => {
+      readings[reading.hwid] = readings[reading.hwid].filter(r => r.macAddress !== reading.macAddress);
+    })
+    return false;
+  } 
+  else return true;
 }

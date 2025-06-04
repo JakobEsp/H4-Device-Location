@@ -37,6 +37,9 @@ export default defineWebSocketHandler({
 
     const validReadings = checkReadings(readings, reading.macAddress);
     if(!validReadings) return;
+    if(!validTimeFrame(validReadings as [WebsocketData, WebsocketData, WebsocketData])){
+      return;
+    }
     removeReadings(reading.macAddress);
     // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     const coordinates = calculateXY(validReadings);
@@ -74,10 +77,17 @@ function removeReadings(macAddress: WebsocketData["macAddress"]) {
   });
 }
 
-// implement
-function removeOldReadings() {
+function validTimeFrame(validReadings: [WebsocketData, WebsocketData, WebsocketData]){
+  // Check if the readings are within a valid time frame, last 60 seconds
   const now = Date.now();
-  Object.keys(readings).forEach(hwid => {
-    readings[hwid as Hwid] = readings[hwid as Hwid].filter(r => now - r.timestamp < 60000); // Keep readings for 1 minute
-  });
+  const invalidReadings = validReadings.filter(reading => now - reading.timestamp > 60 * 1000);
+  if(invalidReadings.length > 0){
+    console.warn("[ws] invalid readings, too old", invalidReadings);
+    // Remove invalid readings from readings
+    invalidReadings.forEach(reading => {
+      readings[reading.hwid] = readings[reading.hwid].filter(r => r.macAddress !== reading.macAddress);
+    })
+    return false;
+  } 
+  else return true;
 }

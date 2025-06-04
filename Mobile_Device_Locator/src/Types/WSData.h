@@ -44,6 +44,7 @@ public:
     const char *convertTime()
     {
         static char timeStr[32];
+
         struct tm *timeinfo = NTPService::getTime();
         if (!timeinfo)
         {
@@ -61,6 +62,7 @@ public:
     const char *toJson()
     {
         static char json[512];
+
         if (!pkt)
         {
             return "{\"error\":\"No packet data available\"}";

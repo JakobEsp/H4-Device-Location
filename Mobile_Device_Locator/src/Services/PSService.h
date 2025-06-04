@@ -12,6 +12,7 @@ public:
     static void incrementChannel();
 
     static int getChannel();
+
     static unsigned long getLastSentPacketTime() {
         return lastSentPacketTime;
     }

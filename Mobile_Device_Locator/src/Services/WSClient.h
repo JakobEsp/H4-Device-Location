@@ -10,7 +10,6 @@ public:
     static void send(WSData &data);
     static bool NeedsReconnect() { return needsReconnect; }
 
-
 private:
     // static void onMessage(WebsocketsMessage message);
     static void onEvent(WebsocketsEvent event, String data);

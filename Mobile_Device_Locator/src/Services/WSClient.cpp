@@ -1,7 +1,9 @@
 #include "WSClient.h"
 #include <ArduinoWebsockets.h>
 #include "NetworkService.h"
+
 #include "./PSService.h"
+
 
 // ws://172.22.224.1:3000/_ws
 const char ip[] = "192.168.0.102";
@@ -25,7 +27,9 @@ void WSClient::setup()
         NetworkService::connect();
     }
 
+
     instance = WebsocketsClient();
+
     instance.onEvent(onEvent);
 
     if (!instance.connect(ip, port, path))
@@ -35,8 +39,10 @@ void WSClient::setup()
     }
 
     Serial.println("WebSocket client setup complete");
+
     isConnecting = false;
     needsReconnect = false;
+
 }
 
 void WSClient::send(WSData &data)

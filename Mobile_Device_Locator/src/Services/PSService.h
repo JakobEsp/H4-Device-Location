@@ -12,7 +12,13 @@ public:
     static void incrementChannel();
 
     static int getChannel();
-
+    static unsigned long getLastSentPacketTime() {
+        return lastSentPacketTime;
+    }
+    static unsigned long setLastSentPacketTime() {
+        lastSentPacketTime = millis();
+        return lastSentPacketTime;
+    }
 private:
     static void setPromiscuousMode(bool enable = true);
     static int channel;

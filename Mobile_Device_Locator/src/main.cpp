@@ -21,8 +21,10 @@ void loop()
   PromService::incrementChannel();
   delay(2500); // wait for 1 second
   int channel = PromService::getChannel();
-  WSClient::setup();
-  PromService::setup();
+  if (WSClient::NeedsReconnect())
+  {
+    WSClient::setup();
+  }
   esp_err_t error = esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
   if (error == ESP_OK)
   {

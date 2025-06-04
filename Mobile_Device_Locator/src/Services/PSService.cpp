@@ -22,7 +22,6 @@ void PromService::promiscuousSniffCallback(void *buf, wifi_promiscuous_pkt_type_
 
     WSData data(pkt);
     WSClient::send(data);
-    lastSentPacketTime = millis();
 }
 
 void PromService::setPromiscuousMode(bool enable)

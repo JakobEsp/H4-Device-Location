@@ -7,14 +7,23 @@ const char ip[] = "192.168.0.102";
 const int port = 3000;
 const char path[] = "/_ws";
 WebsocketsClient WSClient::instance;
+bool WSClient::isConnecting = false;
 
 void WSClient::setup()
 {
+    if (isConnecting)
+    {
+        Serial.println("WebSocket client is already connecting");
+        return;
+    }
+    isConnecting = true;
+
     if (!NetworkService::isConnected())
     {
         NetworkService::connect();
     }
-
+    
+    instance = WebsocketsClient();
     instance.onEvent(onEvent);
 
     if (!instance.connect(ip, port, path))
@@ -24,22 +33,24 @@ void WSClient::setup()
     }
 
     Serial.println("WebSocket client setup complete");
+    isConnecting = false;
 }
 
 void WSClient::send(WSData &data)
 {
-    if (!instance.available())
-    {
+     if (!instance.available())
+     {
         Serial.println("WebSocket ping failed, attempting to reconnect...");
         delay(1000); // Wait for a second before retrying
         setup();
-    }
+     }
 
 
     Serial.printf("%s\n", data.toJson());
     if (!instance.send(data.toJson()))
     {
         Serial.println("Failed to send data over WebSocket");
+        setup();
     }
 }
 

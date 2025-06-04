@@ -13,4 +13,5 @@ private:
     // static void onMessage(WebsocketsMessage message);
     static void onEvent(WebsocketsEvent event, String data);
     static WebsocketsClient instance;
+    static bool isConnecting;
 };

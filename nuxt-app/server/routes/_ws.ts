@@ -27,31 +27,24 @@ export default defineWebSocketHandler({
 
   message(peer, message) {
     console.log("[ws] message", message.text());
-
-    // numberOfRequests++;
-    // console.log("[ws] numberOfRequests", numberOfRequests);
-
     // Handle message type - esp info or esp reading
     const reading: WebsocketData = JSON.parse(message.text());
-    // console.log("[ws] message", reading);
+
     //TODO: add a time check to remove readings that are too old
     //if reading[hwid] already has a reading with reading.mac Address, remove the old reading
     if (readings[reading.hwid].some(r => r.macAddress === reading.macAddress)) {
       readings[reading.hwid] = readings[reading.hwid].filter(r => r.macAddress !== reading.macAddress);
     }
-    // save data until there is messages all esp's with the same id / mac in a reasonable timeframe 
+    // save data until there is messages all esp's with the same macAddress
     readings[reading.hwid].push(reading);
-    // console.log("[ws] readings", readings);
+
     const validReadings = checkReadings(readings, reading.macAddress);
     if(!validReadings) return;
     removeReadings(reading.macAddress);
-    // console.log("[ws] validReadings", validReadings);
     // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     const coordinates = calculateXY(validReadings);
     if(!coordinates) return;
-    // console.log("[ws] coordinates", coordinates);
-
-    // Transform the data to x, y and id
+    // Transform the data to type Device
       try {
         const id = DeviceIds[reading.macAddress] ?? Object.keys(DeviceIds).length + 1;
         const device: Device = {
@@ -64,8 +57,6 @@ export default defineWebSocketHandler({
         devices.push(device);
         peer.publish(peer.websocket.url ?? subscribtion, JSON.stringify(device));
         peer.send(JSON.stringify(device));
-        console.log("published device", device);
-        console.log("topic", peer.topics)
       }catch(error){
         console.error("[ws] error publishing device", error);
       }
@@ -82,11 +73,11 @@ export default defineWebSocketHandler({
 
 function removeReadings(macAddress: WebsocketData["macAddress"]) {
   Object.keys(readings).forEach(hwid => {
-    // console.log("Yeah yeah")
     readings[hwid as Hwid] = readings[hwid as Hwid].filter(r => r.macAddress !== macAddress);
   });
 }
 
+// implement
 function removeOldReadings() {
   const now = Date.now();
   Object.keys(readings).forEach(hwid => {

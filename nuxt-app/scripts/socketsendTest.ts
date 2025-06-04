@@ -1,4 +1,4 @@
-const beaconIds = ["6407Iea7dbcc", "00555bf66870", "8cf585c964ec"];
+const beaconIds = ["64071ea7dbcc", "00555bf6b870", "8cf585c964ec"];
 
 let message: WebsocketData = {
   macAddress: Math.floor(Math.random() * 1000), // Random macAddress for testing

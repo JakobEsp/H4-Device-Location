@@ -36,10 +36,11 @@ export default defineWebSocketHandler({
     readings[reading.hwid].push(reading);
 
     const validReadings = checkReadings(readings, reading.macAddress);
+    console.log("[ws] valid readings", validReadings);
     if(!validReadings) return;
-    if(!validTimeFrame(validReadings as [WebsocketData, WebsocketData, WebsocketData])){
-      return;
-    }
+    // if(!validTimeFrame(validReadings as [WebsocketData, WebsocketData, WebsocketData])){
+    //   return;
+    // }
     removeReadings(reading.macAddress);
     // use Trilateration to get the ca x,y of the device based on esp x,y and distance
     const coordinates = calculateXY(validReadings);

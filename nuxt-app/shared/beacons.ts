@@ -8,11 +8,11 @@ const beacons: Beacon[] = [
   {
     hwid: '8cf585c964ec',
     x: 20,
-    y: 400
+    y: 380
   },
   {
     hwid: '64071ea7dbcc',
-    x: 600,
+    x: 580,
     y: 20
   }
 ]

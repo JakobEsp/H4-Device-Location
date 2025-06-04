@@ -1,7 +1,7 @@
 <!-- filepath: /Users/momoamer/Repos/IoT/H4-Device-Location/nuxt-app/components/heatmap.vue -->
 <template>
 	<div class="w-screen h-screen flex items-center justify-center bg-neutral-100 border-gray-500">
-		<canvas ref="canvasRef" width="600" height="400" class="border-gray-500"></canvas>
+		<canvas ref="canvasRef" width="800" height="500" class="border-gray-500"></canvas>
 	</div>
 </template>
 

@@ -1,4 +1,3 @@
-
 const beacons: Beacon[] = [
   {
     hwid: '00555bf6b870',
